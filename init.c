@@ -6,17 +6,14 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 12:39:19 by mgering           #+#    #+#             */
-/*   Updated: 2024/08/22 17:13:17 by mgering          ###   ########.fr       */
+/*   Updated: 2024/08/30 12:05:31 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	init_data(char **argv, t_data *data)
+int	input_data(char **argv, t_data *data)
 {
-	int	i;
-
-	i = -1;
 	data->num_of_philos = ft_atol(argv[1]);
 	data->time_to_die = ft_atol(argv[2]);
 	data->time_to_eat = ft_atol(argv[3]);
@@ -28,6 +25,17 @@ int	init_data(char **argv, t_data *data)
 	data->dinner_start = false;
 	if (0 != mutex_handler(&data->print_lock, INIT))
 		return (-1);
+	if (0 != mutex_handler(&data->start_lock, INIT))
+		return (-1);
+	init_data(data);
+	return (0);
+}
+
+int	init_data(t_data *data)
+{
+	int	i;
+
+	i = -1;
 	data->philos = malloc(sizeof(t_philo) * data->num_of_philos);
 	if (!data->philos)
 		return (-1);
@@ -35,6 +43,7 @@ int	init_data(char **argv, t_data *data)
 	if (!data->forks)
 	{
 		mutex_handler(&data->print_lock, DESTROY);
+		mutex_handler(&data->start_lock, DESTROY);
 		free(data->philos);
 		return (-1);
 	}
@@ -43,6 +52,7 @@ int	init_data(char **argv, t_data *data)
 		if (0 != mutex_handler(&data->forks[i].fork, INIT))
 		{
 			mutex_handler(&data->print_lock, DESTROY);
+			mutex_handler(&data->start_lock, DESTROY);
 			while (--i >= 0)
 				mutex_handler(&data->forks[i].fork, DESTROY);
 			free(data->forks);

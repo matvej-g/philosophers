@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 17:44:12 by mgering           #+#    #+#             */
-/*   Updated: 2024/08/23 17:09:10 by mgering          ###   ########.fr       */
+/*   Updated: 2024/08/29 14:51:57 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,4 +49,3 @@ int	thread_handler(t_philo *philo, t_operation operation)
 		ret = error_msg(pthread_join(philo->thread, NULL), "pthread JOIN");
 	return (ret);
 }
-

@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/23 16:24:50 by mgering           #+#    #+#             */
-/*   Updated: 2024/08/27 14:34:44 by mgering          ###   ########.fr       */
+/*   Updated: 2024/08/30 13:13:54 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,14 @@ void	philo_eat(t_philo *philo)
 	mutex_handler(&philo->right_fork->fork, LOCK);
 	philo_print(philo, R_FORK);
 	philo_print(philo, EAT);
-	philo->meal_time = accurate_sleep(philo->data->time_to_eat);
+	write_long(&philo->philo_lock, &philo->meal_time, current_time_ms());
+	accurate_sleep(philo->data->time_to_eat);
+	write_long(&philo->philo_lock, &philo->meal_time, current_time_ms());
 	mutex_handler(&philo->left_fork->fork, UNLOCK);
 	mutex_handler(&philo->right_fork->fork, UNLOCK);
 	philo->meals_eaten++;
 	if (philo->data->num_of_meals == philo->meals_eaten)
-		philo->full = true;
+		write_bool(&philo->philo_lock, &philo->full, true);
 }
 
 void	philo_sleep(t_philo *philo)
@@ -36,7 +38,6 @@ void	philo_sleep(t_philo *philo)
 void	philo_think(t_philo *philo)
 {
 	philo_print(philo, THINK);
-	accurate_sleep(philo->data->time_to_sleep);
 }
 
 void	philo_died(t_philo *philo)

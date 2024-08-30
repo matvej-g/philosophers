@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 13:14:49 by mgering           #+#    #+#             */
-/*   Updated: 2024/08/27 14:56:53 by mgering          ###   ########.fr       */
+/*   Updated: 2024/08/30 13:57:35 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,16 +41,17 @@ typedef struct s_fork
 
 typedef struct s_philo
 {
-	int			id;
-	int			meals_eaten;
-	long		meal_time;
-	long		philo_time;
-	bool		is_dead;
-	bool		full;
-	t_fork		*left_fork;
-	t_fork		*right_fork;
-	pthread_t	thread;
-	t_data		*data;
+	int				id;
+	int				meals_eaten;
+	long			start_time;
+	long			meal_time;
+	bool			is_dead;
+	bool			full;
+	t_fork			*left_fork;
+	t_fork			*right_fork;
+	pthread_t		thread;
+	t_data			*data;
+	pthread_mutex_t	philo_lock;
 }				t_philo;
 
 typedef struct s_data
@@ -59,12 +60,11 @@ typedef struct s_data
 	long			time_to_die;
 	long			time_to_eat;
 	long			time_to_sleep;
-	long			dinner_time_start;
-	long			current_time;
 	int				num_of_meals;
 	t_fork			*forks;
 	t_philo			*philos;
 	pthread_mutex_t	print_lock;
+	pthread_mutex_t	start_lock;
 	bool			dinner_start;
 }					t_data;
 
@@ -93,17 +93,22 @@ typedef enum e_print
 int		main(int argc, char **argv);
 void	*philo_routine(void *arg);
 void	*start_dinner(t_data *data);
+void	check_philos(t_data *data);
+bool	check_philos_full(t_data *data);
+void	check_alive(t_philo *philo);
+int		wait_all_philos(t_philo *philo);
 
 //--------------time_utils.c----------------
-long	accurate_sleep(long usec);
-long	current_time_us(void);
+long	accurate_sleep(long msec);
+long	current_time_ms(void);
 
 //--------------check.c---------------------
 int		input_check(char **argv);
 long	ft_atol(const char *str);
 
 //--------------init.c----------------------
-int		init_data(char **argv, t_data *data);
+int		init_data(t_data *data);
+int		input_data(char **argv, t_data *data);
 
 //--------------thread_utils.c--------------
 int		error_msg(int ret, const char *err_msg);
@@ -118,5 +123,14 @@ void	philo_eat(t_philo *philo);
 void	philo_sleep(t_philo *philo);
 void	philo_think(t_philo *philo);
 void	philo_died(t_philo *philo);
+
+//--------------mtx_utils.c------------------
+bool	read_bool(pthread_mutex_t *mtx, bool *dst);
+void	write_bool(pthread_mutex_t *mtx, bool *dst, bool src);
+long	read_time(pthread_mutex_t *mtx, long *dst);
+void	write_long(pthread_mutex_t *mtx, long *dst, long src);
+
+//--------------free_resources.c-------------
+void	free_data(t_data *data);
 
 #endif

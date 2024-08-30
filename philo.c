@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 13:31:53 by mgering           #+#    #+#             */
-/*   Updated: 2024/08/27 14:54:44 by mgering          ###   ########.fr       */
+/*   Updated: 2024/08/30 13:56:44 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,14 @@ int	main(int argc, char **argv)
 			printf("Example: ./philo 800 200 200 200 5\n");
 		else
 		{
-			if (-1 == init_data(argv, &data))
+			if (-1 == input_data(argv, &data))
 			{
 				printf("Data initialize failed");
 				return (-1);
 			}
 			start_dinner(&data);
 		}
-		//cleanup need to do
+		free_data(&data);
 	}
 	else
 		printf("wrong Number of Parameters");
@@ -41,20 +41,21 @@ void	*philo_routine(void *arg)
 	t_philo	*philo;
 
 	philo = (t_philo *)arg;
-	while (!philo->data->dinner_start)
-		usleep(10);
+	while (wait_all_philos(philo))
+		;
+	write_long(&philo->philo_lock, &philo->start_time, current_time_ms());
+	write_long(&philo->philo_lock, &philo->meal_time, current_time_ms());
 	if (philo->data->num_of_philos == 1)
 		;//routine for one philo
 	else if ((philo->id + 1) % 2 == 0)
 	{
 		philo_think(philo);
-		philo->philo_time += accurate_sleep(philo->data->time_to_eat / 2);
+		accurate_sleep(philo->data->time_to_eat / 2);
 	}
-	while (philo->data->dinner_start == true
-		&& philo->is_dead == false && philo->data->num_of_philos > 1)
+	while (read_bool(&philo->data->start_lock, &philo->data->dinner_start)
+		&& !read_bool(&philo->philo_lock, &philo->is_dead) //try without
+		&& philo->full == false)
 	{
-		if (philo->full || philo->is_dead)
-			break ;
 		philo_eat(philo);
 		philo_sleep(philo);
 		philo_think(philo);
@@ -71,74 +72,80 @@ void	*start_dinner(t_data *data)
 	j = -1;
 	if (0 == data->num_of_meals)
 		return (NULL);
-	if (1 == data->num_of_philos)
-		return (NULL);//extra fucntion for one philo need to do
+/* 	if (1 == data->num_of_philos)
+		return (NULL);//extra fucntion for one philo need to do */
 	while (++i < data->num_of_philos)
 	{
 		data->philos[i].id = i + 1;
 		data->philos[i].meals_eaten = 0;
-		data->philos[i].meal_time = 0;
-		data->philos[i].philo_time = 0;
+		data->philos[i].meal_time = current_time_ms();
 		data->philos[i].is_dead = false;
 		data->philos[i].full = false;
 		data->philos[i].left_fork = &data->forks[i];
 		data->philos[i].right_fork = &data->forks[(i + 1)
 			% data->num_of_philos];
 		data->philos[i].data = data;
+		mutex_handler(&data->philos[i].philo_lock, INIT);
 		if (0 != thread_handler(&data->philos[i], CREATE))
 			break ;
 	}
-	data->dinner_start = true;
-	data->dinner_time_start = current_time_us();
+	write_bool(&data->start_lock, &data->dinner_start, true);
+	check_philos(data);
 	while (++j < i)
 		thread_handler(&data->philos[j], JOIN);
 	return (NULL);
 }
 
-
-
-/* void	*test_func(void *add);
-pthread_mutex_t	mutex;
-
-int main()
+void	check_philos(t_data *data)
 {
-	pthread_t	test;
-	pthread_t	test2;
+	int	i;
 
-	long	value1;
-	value1 = 0;
-
- 	pthread_mutex_init(&mutex, NULL);
-    pthread_create(&test, NULL, test_func, (void*) &value1);
-	pthread_create(&test2, NULL, test_func, (void*)&value1);
-
-	pthread_join(test, NULL);
-	pthread_join(test2, NULL);
-
-	pthread_create(&test, NULL, test_func, (void*) &value1);
-	pthread_create(&test2, NULL, test_func, (void*)&value1);
-
-	pthread_join(test, NULL);
-	pthread_join(test2, NULL);
-	pthread_mutex_destroy(&mutex);
-
-    return 0;
+	while (read_bool(&data->start_lock, &data->dinner_start))
+	{
+		i = -1;
+		while (++i < data->num_of_philos)
+			check_alive(&data->philos[i]);
+		if (check_philos_full(data))
+			write_bool(&data->start_lock, &data->dinner_start, false);
+	}
 }
 
-void	*test_func(void *add)
+bool	check_philos_full(t_data *data)
 {
+	int	i;
 
-
-	pthread_mutex_lock(&mutex);
-	long	*add_num = (long *)(add);
-	long	i = 0;
-
-	while (i <= 1000000000)
+	i = -1;
+	while (++i < data->num_of_philos)
 	{
-		i++;
-		(*add_num)++;
+		if (!read_bool(&data->philos[i].philo_lock, &data->philos[i].full))
+			return (false);
 	}
-	printf("Add: %ld\n", *add_num);
-	pthread_mutex_unlock(&mutex);
-	return (NULL);
-} */
+	return (true);
+}
+
+void	check_alive(t_philo *philo)
+{
+	long	time;
+
+	mutex_handler(&philo->philo_lock, LOCK);
+	time = current_time_ms() - philo->meal_time;
+	if (time >= philo->data->time_to_die)
+	{
+		philo_print(philo, DEAD);
+		write_bool(&philo->data->start_lock, &philo->data->dinner_start, false);
+		philo->is_dead = true;
+	}
+	mutex_handler(&philo->philo_lock, UNLOCK);
+}
+
+int	wait_all_philos(t_philo *philo)
+{
+	mutex_handler(&philo->data->start_lock, LOCK);
+	if (philo->data->dinner_start)
+	{
+		mutex_handler(&philo->data->start_lock, UNLOCK);
+		return (0);
+	}
+	mutex_handler(&philo->data->start_lock, UNLOCK);
+	return (1);
+}

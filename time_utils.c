@@ -6,21 +6,22 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 14:59:09 by mgering           #+#    #+#             */
-/*   Updated: 2024/08/27 14:54:34 by mgering          ###   ########.fr       */
+/*   Updated: 2024/08/29 14:51:49 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-long	accurate_sleep(long usec)
+long	accurate_sleep(long msec)
 {
 	struct timeval	start;
 	struct timeval	end;
 	long			elapsed;
 
+	msec *= 1000;
 	elapsed = 0;
 	gettimeofday(&start, NULL);
-	while (elapsed < usec)
+	while (elapsed < msec)
 	{
 		gettimeofday(&end, NULL);
 		elapsed = (end.tv_sec - start.tv_sec) * 1e6L
@@ -29,15 +30,10 @@ long	accurate_sleep(long usec)
 	return (elapsed);
 }
 
-long	current_time_us(void)
+long	current_time_ms(void)
 {
 	struct timeval	time;
 
 	gettimeofday(&time, NULL);
-	return ((time.tv_sec * 1e6L) + (time.tv_usec));
+	return ((time.tv_sec * 1e3L) + (time.tv_usec / 1e3L));
 }
-
-/* void	cleanup(t_data data)
-{
-	
-} */

@@ -1,15 +1,15 @@
 NAME	= philo
 
 SRCS	= \
-	check.c init.c message.c philo_state.c time_utils.c philo.c thread_utils.c
+	check.c init.c message.c philo_state.c time_utils.c philo.c thread_utils.c mtx_utils.c free_resources.c
 
 OBJS	= $(SRCS:.c=.o)
 
 $(NAME)	: $(OBJS)
-	cc -pthread -o $(NAME) $(OBJS)
+	cc -pthread -o $(NAME) $(OBJS) -fsanitize=thread
 
 $(OBJS)	: %.o : %.c
-	cc -Wall -Werror -Wextra -pthread -c $<
+	cc -Wall -Werror -Wextra -fsanitize=thread -g -pthread -Ofast -c $<
 
 all	: $(NAME)
 
