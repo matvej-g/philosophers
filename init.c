@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 12:39:19 by mgering           #+#    #+#             */
-/*   Updated: 2024/08/30 12:05:31 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/02 17:30:32 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,39 +27,53 @@ int	input_data(char **argv, t_data *data)
 		return (-1);
 	if (0 != mutex_handler(&data->start_lock, INIT))
 		return (-1);
-	init_data(data);
+	alloc_data(data);
 	return (0);
 }
 
-int	init_data(t_data *data)
+int	alloc_data(t_data *data)
 {
 	int	i;
 
 	i = -1;
-	data->philos = malloc(sizeof(t_philo) * data->num_of_philos);
+	data->philos = ft_calloc(data->num_of_philos, sizeof(t_philo));
 	if (!data->philos)
 		return (-1);
-	data->forks = malloc(sizeof(t_fork) * data->num_of_philos);
+	data->forks = ft_calloc(data->num_of_philos, sizeof(t_fork));
 	if (!data->forks)
 	{
-		mutex_handler(&data->print_lock, DESTROY);
-		mutex_handler(&data->start_lock, DESTROY);
-		free(data->philos);
+		free_data(data);
 		return (-1);
 	}
 	while (++i < data->num_of_philos)
 	{
 		if (0 != mutex_handler(&data->forks[i].fork, INIT))
 		{
-			mutex_handler(&data->print_lock, DESTROY);
-			mutex_handler(&data->start_lock, DESTROY);
-			while (--i >= 0)
-				mutex_handler(&data->forks[i].fork, DESTROY);
-			free(data->forks);
-			free(data->philos);
+			free_data(data);
 			return (-1);
 		}
 		data->forks[i].fork_id = i;
 	}
 	return (0);
+}
+
+void	*init_philo(t_data *data, int *i)
+{
+	while (++*i < data->num_of_philos)
+	{
+		data->philos[*i].id = *i + 1;
+		data->philos[*i].meals_eaten = 0;
+		data->philos[*i].meal_time = current_time_ms();
+		data->philos[*i].is_dead = false;
+		data->philos[*i].full = false;
+		if (1 < data->num_of_philos)
+			data->philos[*i].left_fork = &data->forks[(*i + 1)
+				% data->num_of_philos];
+		data->philos[*i].right_fork = &data->forks[*i];
+		data->philos[*i].data = data;
+		mutex_handler(&data->philos[*i].philo_lock, INIT);
+		if (0 != thread_handler(&data->philos[*i], CREATE))
+			break ;
+	}
+	return (NULL);
 }

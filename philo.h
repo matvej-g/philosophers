@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 13:14:49 by mgering           #+#    #+#             */
-/*   Updated: 2024/08/30 13:57:35 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/02 17:16:22 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,12 +91,17 @@ typedef enum e_print
 
 //--------------philo.c---------------------
 int		main(int argc, char **argv);
-void	*philo_routine(void *arg);
 void	*start_dinner(t_data *data);
+int		wait_all_philos(t_philo *philo);
+
+//--------------philo_routine.c-------------
+void	*philo_routine(void *arg);
+void	*one_routine(t_philo *philo);
+
+//--------------philo_check.c---------------
 void	check_philos(t_data *data);
 bool	check_philos_full(t_data *data);
 void	check_alive(t_philo *philo);
-int		wait_all_philos(t_philo *philo);
 
 //--------------time_utils.c----------------
 long	accurate_sleep(long msec);
@@ -105,10 +110,12 @@ long	current_time_ms(void);
 //--------------check.c---------------------
 int		input_check(char **argv);
 long	ft_atol(const char *str);
+void	*ft_calloc(size_t nitems, size_t size);
 
 //--------------init.c----------------------
-int		init_data(t_data *data);
 int		input_data(char **argv, t_data *data);
+int		alloc_data(t_data *data);
+void	*init_philo(t_data *data, int *i);
 
 //--------------thread_utils.c--------------
 int		error_msg(int ret, const char *err_msg);

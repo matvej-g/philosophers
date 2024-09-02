@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 12:50:07 by mgering           #+#    #+#             */
-/*   Updated: 2024/08/21 13:40:10 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/02 17:12:44 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,4 +67,21 @@ long	ft_atol(const char *str)
 	}
 	result = result * sign;
 	return (result);
+}
+
+void	*ft_calloc(size_t nitems, size_t size)
+{
+	char	*memory_ptr;
+	size_t	i;
+
+	i = 0;
+	memory_ptr = malloc(nitems * size);
+	if (!memory_ptr)
+		return (NULL);
+	while (i < (nitems * size))
+	{
+		*((unsigned char *)memory_ptr + i) = '\0';
+		i++;
+	}
+	return (memory_ptr);
 }
