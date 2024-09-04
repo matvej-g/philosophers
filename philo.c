@@ -6,11 +6,17 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 13:31:53 by mgering           #+#    #+#             */
-/*   Updated: 2024/09/02 17:25:55 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/04 14:28:52 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+// void check_leaks(void)
+// {
+//     system("leaks philo");
+// }
+// 		atexit(check_leaks);
 
 int	main(int argc, char **argv)
 {
@@ -19,12 +25,15 @@ int	main(int argc, char **argv)
 	if (argc == 5 || argc == 6)
 	{
 		if (-1 == input_check(argv))
-			printf("Example: ./philo 800 200 200 200 5\n");
+		{
+			printf("Example: ./philo 5 500 200 200 5\n");
+			return (-1);
+		}
 		else
 		{
 			if (-1 == input_data(argv, &data))
 			{
-				printf("Data initialize failed");
+				printf("Data initialize failed\n");
 				return (-1);
 			}
 			start_dinner(&data);
@@ -32,7 +41,7 @@ int	main(int argc, char **argv)
 		free_data(&data);
 	}
 	else
-		printf("wrong Number of Parameters");
+		printf("wrong Number of Parameters\n");
 	return (0);
 }
 

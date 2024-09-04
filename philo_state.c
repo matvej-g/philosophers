@@ -6,27 +6,57 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/23 16:24:50 by mgering           #+#    #+#             */
-/*   Updated: 2024/09/02 16:25:34 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/04 13:41:27 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	philo_eat(t_philo *philo)
+void	*philo_eat(t_philo *philo)
 {
-	mutex_handler(&philo->right_fork->fork, LOCK);
-	philo_print(philo, R_FORK);
-	mutex_handler(&philo->left_fork->fork, LOCK);
-	philo_print(philo, L_FORK);
+	t_fork	*first_fork;
+	t_fork	*second_fork;
+
+	first_fork = NULL;
+	second_fork = NULL;
+	if (0 > assign_forks(philo, &first_fork, &second_fork))
+		return (NULL);
+	mutex_handler(&first_fork->fork, LOCK);
+	philo_print(philo, FORK);
+	mutex_handler(&second_fork->fork, LOCK);
+	philo_print(philo, FORK);
 	philo_print(philo, EAT);
 	write_long(&philo->philo_lock, &philo->meal_time, current_time_ms());
 	accurate_sleep(philo->data->time_to_eat);
 	write_long(&philo->philo_lock, &philo->meal_time, current_time_ms());
-	mutex_handler(&philo->left_fork->fork, UNLOCK);
-	mutex_handler(&philo->right_fork->fork, UNLOCK);
+	mutex_handler(&first_fork->fork, UNLOCK);
+	mutex_handler(&second_fork->fork, UNLOCK);
+	write_bool(&philo->bool_lock, &philo->can_eat, false);
 	philo->meals_eaten++;
 	if (philo->data->num_of_meals == philo->meals_eaten)
-		write_bool(&philo->philo_lock, &philo->full, true);
+		write_bool(&philo->bool_lock, &philo->full, true);
+	return (NULL);
+}
+
+int	assign_forks(t_philo *philo, t_fork **first, t_fork **second)
+{
+	while (!read_bool(&philo->bool_lock, &philo->can_eat))
+	{
+		if (!read_bool(&philo->data->start_lock, &philo->data->dinner_start))
+			return (-1);
+		usleep(100);
+	}
+	if (philo->id != philo->data->num_of_philos)
+	{
+		*first = philo->left_fork;
+		*second = philo->right_fork;
+	}
+	else
+	{
+		*first = philo->right_fork;
+		*second = philo->left_fork;
+	}
+	return (0);
 }
 
 void	philo_sleep(t_philo *philo)
@@ -38,10 +68,4 @@ void	philo_sleep(t_philo *philo)
 void	philo_think(t_philo *philo)
 {
 	philo_print(philo, THINK);
-}
-
-void	philo_died(t_philo *philo)
-{
-	philo->is_dead = true;
-	philo_print(philo, DEAD);
 }

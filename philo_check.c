@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 16:59:02 by mgering           #+#    #+#             */
-/*   Updated: 2024/09/02 17:37:42 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/04 13:52:30 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ bool	check_philos_full(t_data *data)
 	i = -1;
 	while (++i < data->num_of_philos)
 	{
-		if (!read_bool(&data->philos[i].philo_lock, &data->philos[i].full))
+		if (!read_bool(&data->philos[i].bool_lock, &data->philos[i].full))
 			return (false);
 		usleep(100);
 	}
@@ -47,13 +47,12 @@ void	check_alive(t_philo *philo)
 {
 	long	time;
 
-	mutex_handler(&philo->philo_lock, LOCK);
-	time = current_time_ms() - philo->meal_time;
+	time = current_time_ms() - read_time(&philo->philo_lock, &philo->meal_time);
 	if (time >= philo->data->time_to_die)
 	{
 		philo_print(philo, DEAD);
 		write_bool(&philo->data->start_lock, &philo->data->dinner_start, false);
-		philo->is_dead = true;
 	}
-	mutex_handler(&philo->philo_lock, UNLOCK);
+	else if (time > (philo->data->time_to_eat + 5))
+		write_bool(&philo->bool_lock, &philo->can_eat, true);
 }

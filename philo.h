@@ -6,29 +6,26 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 13:14:49 by mgering           #+#    #+#             */
-/*   Updated: 2024/09/02 17:16:22 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/04 14:06:50 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
-# include <limits.h> //INT_MAX
+# include <limits.h>	//INT_MAX
 # include <stdbool.h>	//fot bool type
 # include <string.h>	//memset
-# include <stdio.h>	//printf
-# include <stdlib.h> //maloc, free
-# include <unistd.h> //write, usleep
-# include <sys/time.h> //gettimeofday
-# include <errno.h> //err return values for pthread
-# include <pthread.h> /* pthread_create, pthread_detach, pthread_join, pthread_mutex_init, pthread_mutex_destroy, pthread_mutex_lock, pthread_mutex_unlock
-						*/
+# include <stdio.h>		//printf
+# include <stdlib.h>	//maloc, free
+# include <unistd.h>	//write, usleep
+# include <sys/time.h>	//gettimeofday
+# include <errno.h>		//err return values for pthread
+# include <pthread.h>	/* pthread_create, pthread_detach, pthread_join, pthread_mutex_init, pthread_mutex_destroy, pthread_mutex_lock, pthread_mutex_unlock
+*/
 # define RED "\033[31m"	//Define ANSI escape sequences for colors and styles
 # define GR "\033[32m"
 # define YEL "\033[33m"
 # define BL "\033[34m"
-# define MAG "\033[35m"
-# define CY "\033[36m"
-# define WHITE "\033[37m"
 # define RST "\033[0m"
 
 typedef struct s_data	t_data;
@@ -45,14 +42,15 @@ typedef struct s_philo
 	int				meals_eaten;
 	long			start_time;
 	long			meal_time;
-	bool			is_dead;
+	bool			can_eat;
 	bool			full;
 	t_fork			*left_fork;
 	t_fork			*right_fork;
 	pthread_t		thread;
 	t_data			*data;
 	pthread_mutex_t	philo_lock;
-}				t_philo;
+	pthread_mutex_t	bool_lock;
+}	t_philo;
 
 typedef struct s_data
 {
@@ -66,12 +64,11 @@ typedef struct s_data
 	pthread_mutex_t	print_lock;
 	pthread_mutex_t	start_lock;
 	bool			dinner_start;
-}					t_data;
+}	t_data;
 
 typedef enum e_operation
 {
 	CREATE,
-	DETACH,
 	JOIN,
 	INIT,
 	DESTROY,
@@ -81,13 +78,12 @@ typedef enum e_operation
 
 typedef enum e_print
 {
-	L_FORK,
-	R_FORK,
+	FORK,
 	EAT,
 	SLEEP,
 	THINK,
 	DEAD,
-}			t_print;
+}	t_print;
 
 //--------------philo.c---------------------
 int		main(int argc, char **argv);
@@ -126,7 +122,8 @@ int		thread_handler(t_philo *philp, t_operation operation);
 int		philo_print(t_philo *philo, t_print msg);
 
 //--------------philo_state.c---------------
-void	philo_eat(t_philo *philo);
+void	*philo_eat(t_philo *philo);
+int		assign_forks(t_philo *philo, t_fork **first, t_fork **second);
 void	philo_sleep(t_philo *philo);
 void	philo_think(t_philo *philo);
 void	philo_died(t_philo *philo);

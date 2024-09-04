@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/30 13:39:01 by mgering           #+#    #+#             */
-/*   Updated: 2024/09/02 16:55:37 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/03 16:45:39 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void	free_data(t_data *data)
 		while (++i < data->num_of_philos)
 		{
 			mutex_handler(&data->philos[i].philo_lock, DESTROY);
+			mutex_handler(&data->philos[i].bool_lock, DESTROY);
 			mutex_handler(&data->forks[i].fork, DESTROY);
 		}
 		free(data->philos);
