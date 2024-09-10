@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 12:39:19 by mgering           #+#    #+#             */
-/*   Updated: 2024/09/03 16:50:57 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/10 13:38:55 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int	input_data(char **argv, t_data *data)
 		data->num_of_meals = ft_atol(argv[5]);
 	else
 		data->num_of_meals = -1;
-	data->dinner_start = false;
+	data->dinner_start = true;
 	if (0 != mutex_handler(&data->print_lock, INIT))
 		return (-1);
 	if (0 != mutex_handler(&data->start_lock, INIT))

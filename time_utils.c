@@ -6,28 +6,19 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 14:59:09 by mgering           #+#    #+#             */
-/*   Updated: 2024/09/03 16:08:05 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/10 13:11:23 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-long	accurate_sleep(long msec)
+void	accurate_sleep(long msec)
 {
-	struct timeval	start;
-	struct timeval	end;
-	long			elapsed;
+	long	start;
 
-	msec *= 1000;
-	elapsed = 0;
-	gettimeofday(&start, NULL);
-	while (elapsed < msec)
-	{
-		gettimeofday(&end, NULL);
-		elapsed = (end.tv_sec - start.tv_sec) * 1e6L
-			+ (end.tv_usec - start.tv_usec);
-	}
-	return (elapsed);
+	start = current_time_ms();
+	while ((current_time_ms() - start) < msec)
+		usleep(500);
 }
 
 long	current_time_ms(void)

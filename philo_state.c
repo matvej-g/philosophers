@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/23 16:24:50 by mgering           #+#    #+#             */
-/*   Updated: 2024/09/04 13:41:27 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/10 13:35:53 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,13 @@ void	*philo_eat(t_philo *philo)
 	second_fork = NULL;
 	if (0 > assign_forks(philo, &first_fork, &second_fork))
 		return (NULL);
+	if (!read_bool(&philo->data->start_lock, &philo->data->dinner_start))
+		return (NULL);
 	mutex_handler(&first_fork->fork, LOCK);
 	philo_print(philo, FORK);
 	mutex_handler(&second_fork->fork, LOCK);
 	philo_print(philo, FORK);
 	philo_print(philo, EAT);
-	write_long(&philo->philo_lock, &philo->meal_time, current_time_ms());
 	accurate_sleep(philo->data->time_to_eat);
 	write_long(&philo->philo_lock, &philo->meal_time, current_time_ms());
 	mutex_handler(&first_fork->fork, UNLOCK);

@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 13:14:49 by mgering           #+#    #+#             */
-/*   Updated: 2024/09/04 14:06:50 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/10 14:38:55 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ typedef struct s_philo
 {
 	int				id;
 	int				meals_eaten;
-	long			start_time;
 	long			meal_time;
 	bool			can_eat;
 	bool			full;
@@ -58,6 +57,7 @@ typedef struct s_data
 	long			time_to_die;
 	long			time_to_eat;
 	long			time_to_sleep;
+	long			start_time;
 	int				num_of_meals;
 	t_fork			*forks;
 	t_philo			*philos;
@@ -95,12 +95,12 @@ void	*philo_routine(void *arg);
 void	*one_routine(t_philo *philo);
 
 //--------------philo_check.c---------------
-void	check_philos(t_data *data);
-bool	check_philos_full(t_data *data);
-void	check_alive(t_philo *philo);
+void	*check_philos_full(void *arg);
+void	*check_philos_alive(void *arg);
+void	stop_dinner(t_data *data, int *i);
 
 //--------------time_utils.c----------------
-long	accurate_sleep(long msec);
+void	accurate_sleep(long msec);
 long	current_time_ms(void);
 
 //--------------check.c---------------------
