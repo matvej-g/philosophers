@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/15 13:14:49 by mgering           #+#    #+#             */
-/*   Updated: 2024/09/10 14:38:55 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/12 15:14:37 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,6 @@ typedef enum e_print
 //--------------philo.c---------------------
 int		main(int argc, char **argv);
 void	*start_dinner(t_data *data);
-int		wait_all_philos(t_philo *philo);
 
 //--------------philo_routine.c-------------
 void	*philo_routine(void *arg);
@@ -97,7 +96,7 @@ void	*one_routine(t_philo *philo);
 //--------------philo_check.c---------------
 void	*check_philos_full(void *arg);
 void	*check_philos_alive(void *arg);
-void	stop_dinner(t_data *data, int *i);
+void	*stop_dinner(t_data *data, int *i, long *time);
 
 //--------------time_utils.c----------------
 void	accurate_sleep(long msec);
@@ -126,7 +125,6 @@ void	*philo_eat(t_philo *philo);
 int		assign_forks(t_philo *philo, t_fork **first, t_fork **second);
 void	philo_sleep(t_philo *philo);
 void	philo_think(t_philo *philo);
-void	philo_died(t_philo *philo);
 
 //--------------mtx_utils.c------------------
 bool	read_bool(pthread_mutex_t *mtx, bool *dst);

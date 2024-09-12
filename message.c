@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/23 15:58:45 by mgering           #+#    #+#             */
-/*   Updated: 2024/09/10 14:47:45 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/12 14:55:09 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,11 @@ int	philo_print(t_philo *philo, t_print msg)
 	time = current_time_ms();
 	time -= read_time(&philo->data->start_lock, &philo->data->start_time);
 	if (msg == FORK)
-		printf("%ld %d has taken a fork\n", time, philo->id);
+		printf(BL"%ld %d has taken a fork\n"RST, time, philo->id);
 	else if (msg == EAT)
-		printf("%ld %d is eating\n", time, philo->id);
+		printf(YEL"%ld %d is eating\n"RST, time, philo->id);
 	else if (msg == SLEEP)
-		printf("%ld %d is sleeping\n", time, philo->id);
+		printf(GR"%ld %d is sleeping\n"RST, time, philo->id);
 	else if (msg == THINK)
 		printf("%ld %d is thinking\n", time, philo->id);
 	mutex_handler(&data->print_lock, UNLOCK);

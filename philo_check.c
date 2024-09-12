@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 16:59:02 by mgering           #+#    #+#             */
-/*   Updated: 2024/09/10 14:44:58 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/12 15:01:41 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void	*check_philos_alive(void *arg)
 					- read_time(&data->philos[i].philo_lock,
 						&data->philos[i].meal_time));
 			if (time >= data->time_to_die)
-				stop_dinner(data, &i);
+				stop_dinner(data, &i, &time);
 			else if (time > (data->time_to_eat + 5))
 				write_bool(&data->philos[i].bool_lock,
 					&data->philos[i].can_eat, true);
@@ -56,15 +56,16 @@ void	*check_philos_alive(void *arg)
 	return (NULL);
 }
 
-void	stop_dinner(t_data *data, int *i)
+void	*stop_dinner(t_data *data, int *i, long *time)
 {
-	long	time;
-
 	pthread_mutex_lock(&data->print_lock);
-	time = (current_time_ms()
-			- read_time(&data->philos[*i].philo_lock,
-				&data->start_time));
-	printf(RED"%ld %d died\n"RST, time, data->philos[*i].id);
+	if (!read_bool(&data->start_lock, &data->dinner_start))
+	{
+		pthread_mutex_unlock(&data->print_lock);
+		return (NULL);
+	}
+	printf(RED"%ld %d died\n"RST, *time, data->philos[*i].id);
 	write_bool(&data->start_lock, &data->dinner_start, false);
 	pthread_mutex_unlock(&data->print_lock);
+	return (NULL);
 }
