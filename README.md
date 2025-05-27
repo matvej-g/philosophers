@@ -23,14 +23,14 @@ The **Dining Philosophers** problem is a classic concurrency exercise: N philoso
   - Detects philosopher death and cleans up threads/processes  
   - Prevents resource leaks   
 - **Configurable parameters**:  
-  - Number of philosophers  (running > 200 Philos will probably not work correctly)
+  - Number of philosophers  (don't run < 200 philos, this may overwhel your CPU)
   - Time to die (ms)  (use > 60)
   - Time to eat (ms)  (use > 60)
   - Time to sleep (ms)  (use > 60)
   - [Optional] Number of times each must eat  
   
 - **Norm-compliant**:  
-  - Only allowed functions (`malloc`, `free`, `write`, `pthread_…`, `fork`, `sem_…`, `usleep`)  
+  - Only allowed functions
   - Max 25 lines per function  
   - 80-column width limit  
   - Max 4 functions per file  
