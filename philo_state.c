@@ -6,7 +6,7 @@
 /*   By: mgering <mgering@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/23 16:24:50 by mgering           #+#    #+#             */
-/*   Updated: 2024/09/12 17:53:24 by mgering          ###   ########.fr       */
+/*   Updated: 2024/09/10 13:35:53 by mgering          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,8 @@ void	*philo_eat(t_philo *philo)
 	mutex_handler(&second_fork->fork, LOCK);
 	philo_print(philo, FORK);
 	philo_print(philo, EAT);
-	write_long(&philo->philo_lock, &philo->meal_time, current_time_ms());
 	accurate_sleep(philo->data->time_to_eat);
+	write_long(&philo->philo_lock, &philo->meal_time, current_time_ms());
 	mutex_handler(&first_fork->fork, UNLOCK);
 	mutex_handler(&second_fork->fork, UNLOCK);
 	write_bool(&philo->bool_lock, &philo->can_eat, false);
