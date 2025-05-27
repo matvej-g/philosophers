@@ -51,9 +51,9 @@ The **Dining Philosophers** problem is a classic concurrency exercise: N philoso
   ./philo number_of_philosophers <time_to_die> <time_to_eat> <<time_to_sleep> [number_of_times_each_philosopher_must_eat]
 ```
 
-## Exanple
+## Example
 
 ```bash
   ./philo 5 800 200 200 2
 ```
-
+![Philosophers example](image/example.png)
